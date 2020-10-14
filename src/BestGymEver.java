@@ -16,14 +16,12 @@ import java.util.Scanner;
 public class BestGymEver {
 
     List<Customer> customers = new ArrayList<>();
-    boolean testingMode;
 
 
     public String getInput(boolean test) {
-        testingMode = test;
         String input;
 
-        if (testingMode) {
+        if (test) {
             input = "bear belle";
         } else {
             input = JOptionPane.showInputDialog("Mata in personens för- och efternamn \n Alternativt personnummer:");
@@ -35,10 +33,9 @@ public class BestGymEver {
     }
 
     public boolean checkMembership(Customer c, boolean test) {
-        testingMode = test;
         LocalDate today;
 
-        if (testingMode) {
+        if (test) {
             today = LocalDate.parse("2020-10-10");
         } else {
             today = LocalDate.now();
@@ -67,85 +64,73 @@ public class BestGymEver {
         }
     }
 
-//TODO måste kunna mata in personnr
-    public void checkCustomer(String input) throws IOException {
+    public String checkCustomer(String input, boolean test) throws IOException {
         input = input.trim();
         input = input.replace("-", "");
         Scanner scanner = new Scanner(input);
         if(Character.isDigit(input.charAt(0))){
-            checkCustomerById(scanner);
+            return checkCustomerById(scanner, test);
         } else {
-            checkCustomerByName(scanner);
+            return checkCustomerByName(scanner, test);
         }
 
     }
 
-    public void checkCustomerById(Scanner scanner) throws IOException {
+    public String checkCustomerById(Scanner scanner, boolean test) throws IOException {
         String id = scanner.next();
         if (scanner.hasNext()) {
-            JOptionPane.showMessageDialog(null, "Oj då, nu vart det mycket." +
-                    "\n Mata endast in för- och efternamn, eller personnummer.");
-            return;
+            return "Mata endast in för- och efternamn, eller personnummer.";
         }
         if (id.length() != 10){
-            JOptionPane.showMessageDialog(null, "Personnummret måste innehålla 10 siffror.");
-            return;
+            return "Personnummret måste innehålla 10 siffror.";
         }
         for (Customer c : getCustomers()){
             if(c.getId().equals(id)){
-                if (checkMembership(c, false)) {
-                    registerWorkout(c, false);
-                    JOptionPane.showMessageDialog(null, "Välkommen " + c.getFirstName() + ". Besök registrerat.");
-                    return;
+                if (checkMembership(c, test)) {
+                    registerWorkout(c, test);
+                    return "Välkommen " + c.getFirstName() + ". Besök registrerat.";
                 } else {
-                    JOptionPane.showMessageDialog(null, "Oj då, " + c.getFirstName() +
-                            " har inte betalat sin årsavgift. \n Senaste betalningen : " + c.getLastPayment());
-                    return;
+                    return "Oj då, " + c.getFirstName() +
+                            " har inte betalat sin årsavgift. \n Senaste betalningen : " + c.getLastPayment();
                 }
             }
         }
-        JOptionPane.showMessageDialog(null, "Personen finns inte i systemet.");
+        return "Personen finns inte i systemet.";
     }
 
-    public void checkCustomerByName(Scanner scanner) throws IOException {
+    public String checkCustomerByName(Scanner scanner, boolean test) throws IOException {
         String name1;
         String name2;
         try {
             name1 = scanner.next();
             name2 = scanner.next();
         } catch (NoSuchElementException e) {
-            JOptionPane.showMessageDialog(null, "Felaktig inmatning, måste innehålla för- och efternamn, eller personnummer");
-            return;
+            return "Felaktig inmatning, måste innehålla för- och efternamn, eller personnummer";
         }
 
         if (scanner.hasNext()) {
-            JOptionPane.showMessageDialog(null, "Oj då, nu vart det mycket." +
-                    "\n Mata endast in för- och efternamn, eller personnummer");
-            return;
+            return "Mata endast in för- och efternamn, eller personnummer";
         }
 
         for (Customer c : getCustomers()) {
             if ((name1.equalsIgnoreCase(c.getFirstName()) && name2.equalsIgnoreCase(c.getLastName())) ||
                     (name2.equalsIgnoreCase(c.getFirstName()) && name1.equalsIgnoreCase(c.getLastName()))) {
 
-                if (checkMembership(c, false)) {
-                    registerWorkout(c, false);
-                    JOptionPane.showMessageDialog(null, "Välkommen " + c.getFirstName() + ". Besök registrerat.");
-                    return;
+                if (checkMembership(c, test)) {
+                    registerWorkout(c, test);
+                    return "Välkommen " + c.getFirstName() + ". Besök registrerat.";
                 } else {
-                    JOptionPane.showMessageDialog(null, "Oj då, " + c.getFirstName() +
-                            " har inte betalat sin årsavgift. \n Senaste betalningen : " + c.getLastPayment());
-                    return;
+                    return "Oj då, " + c.getFirstName() +
+                            " har inte betalat sin årsavgift. \n Senaste betalningen : " + c.getLastPayment();
                 }
             }
         }
-        JOptionPane.showMessageDialog(null, "Personen finns inte i systemet.");
+        return "Personen finns inte i systemet.";
     }
 
     public void registerWorkout(Customer customer, boolean test) throws IOException {
-        testingMode = test;
         LocalDate today;
-        if (testingMode) {
+        if (test) {
             today = LocalDate.parse("2020-10-10");
         } else {
             today = LocalDate.now();
@@ -160,8 +145,10 @@ public class BestGymEver {
 
     public void gymStart(String fileName) throws IOException {
         parseCustomerFile(fileName);
+        String out;
         while (true) {
-            checkCustomer(getInput(false));
+            out = checkCustomer(getInput(false), false);
+            JOptionPane.showMessageDialog(null, out);
         }
     }
 

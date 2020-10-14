@@ -3,6 +3,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Scanner;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,6 +54,22 @@ class BestGymEverTest {
         String s = "testtext";
         writer.write(s);
         writer.close();
+    }
+
+    @Test
+    public void checkCustomerTest() throws IOException {
+        BestGymEver gym = new BestGymEver();
+        gym.getCustomers().add(new Customer("1234567890", "Pelle", "Svanslös", LocalDate.parse("2020-01-30")));
+        gym.getCustomers().add(new Customer("7502031234",  "Anna",  "Andersson", LocalDate.parse("2020-01-30")));
+
+        String output = gym.checkCustomer("123456-7890", true);
+        assertEquals(output, "Välkommen Pelle. Besök registrerat.");
+
+        output = gym.checkCustomer("svanslös pelle", true);
+        assertEquals(output, "Välkommen Pelle. Besök registrerat.");
+
+        output = gym.checkCustomer("7502031234", true);
+        assertEquals(output, "Välkommen Anna. Besök registrerat.");
     }
 
     @Test
